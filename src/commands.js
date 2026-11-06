@@ -1,24 +1,104 @@
-// Your bot's behaviour. Add commands here; grammY's docs (grammy.dev) cover
-// keyboards, sessions, files, inline queries and everything else.
-
-import { InlineKeyboard } from "grammy"
-
 export function registerCommands(bot) {
-  bot.command("start", (ctx) =>
-    ctx.reply(`Hi ${ctx.from?.first_name ?? "there"}. I am alive and hosted on FadeHost. Send /help to see what I can do.`, {
-      reply_markup: new InlineKeyboard().text("Ping me", "ping"),
-    }),
-  )
 
-  bot.command("help", (ctx) =>
-    ctx.reply(["Commands:", "/start  say hello", "/help   this list", "/ping   check I am awake", "/id     show chat and user ids", "", "Send me any text and I echo it back."].join("\n")),
-  )
+  const isGroup = (ctx) =>
+    ["group", "supergroup"].includes(ctx.chat.type)
 
-  bot.command("ping", (ctx) => ctx.reply("pong"))
+  // الترحيب بالأعضاء الجدد
+  bot.on("message:new_chat_members", async (ctx) => {
+    if (!isGroup(ctx)) return
 
-  bot.command("id", (ctx) => ctx.reply(`Chat id: ${ctx.chat.id}\nYour id: ${ctx.from?.id ?? "unknown"}`))
+    for (const user of ctx.message.new_chat_members) {
+      if (user.is_bot) continue
 
-  bot.callbackQuery("ping", (ctx) => ctx.answerCallbackQuery({ text: "pong" }))
+      await ctx.reply(
+        `╭────── 💗 ──────╮
 
-  bot.on("message:text", (ctx) => ctx.reply(ctx.message.text))
+أهلاً وسهلاً بك ${user.first_name}
+
+نورت مجموعتنا مع نالي 🌸
+
+نتمنى لك وقتاً ممتعاً
+
+╰────── 💗 ──────╯`
+      )
+    }
+  })
+
+  // أمر المساعدة
+  bot.command("start", (ctx) => {
+    if (!isGroup(ctx)) return
+    return ctx.reply(
+      "أهلاً بك في NALI BOT 💗\nأنا نالي، مساعدة مجموعتك 🌸\nاكتب /help لمعرفة الأوامر"
+    )
+  })
+
+  bot.command("help", (ctx) => {
+    if (!isGroup(ctx)) return
+    return ctx.reply(
+      `💗 أوامر نالي
+
+/start - الترحيب
+/help - المساعدة
+/ping - فحص البوت
+/id - عرض الآيدي
+/rank - معرفة رتبتك
+
+NALI BOT 💗`
+    )
+  })
+
+  // فحص التشغيل
+  bot.command("ping", (ctx) => {
+    if (!isGroup(ctx)) return
+    return ctx.reply("NALI ONLINE 💗")
+  })
+
+  // عرض الآيدي
+  bot.command("id", (ctx) => {
+    if (!isGroup(ctx)) return
+    return ctx.reply(
+      `Chat ID: ${ctx.chat.id}\nUser ID: ${ctx.from.id}`
+    )
+  })
+
+  // الرتب
+  bot.command("rank", async (ctx) => {
+    if (!isGroup(ctx)) return
+
+    const member = await ctx.getChatMember(ctx.from.id)
+
+    let rank = "👤 عضو"
+
+    if (member.status === "creator") {
+      rank = "👑 مالك المجموعة"
+    } else if (member.status === "administrator") {
+      rank = "🛡️ مشرف"
+    }
+
+    return ctx.reply(`رتبتك:\n${rank}`)
+  })
+
+  // الردود التلقائية
+  bot.on("message:text", async (ctx) => {
+    if (!isGroup(ctx)) return
+
+    const text = ctx.message.text.trim().toLowerCase()
+
+    const replies = {
+      "نالي": "سمي يا قلبي 💗",
+      "مرحبا": "يا هلا وغلا 🌸",
+      "هلا": "هلا؟ 💗",
+      "كيفك": "بخير دامك بخير ❤️",
+      "احبك": "وأنا أحب وجودك 💗",
+      "أحبك": "وأنا أحبك  💗",
+      "صباح الخير": "صباح النور والسرور 🌷",
+      "مساء الخير": "مساء الورد والياسمين 🌹",
+      "تصبحون على خير": "وأنتم من أهله 💗"
+    }
+
+    if (replies[text]) {
+      return ctx.reply(replies[text])
+    }
+  })
+
 }
