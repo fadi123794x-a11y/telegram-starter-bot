@@ -1,24 +1,25 @@
-// Your bot's behaviour. Add commands here; grammY's docs (grammy.dev) cover
-// keyboards, sessions, files, inline queries and everything else.
+bot.on("message:text", async (ctx) => {
+  if (ctx.chat.type !== "group" && ctx.chat.type !== "supergroup") return
 
-import { InlineKeyboard } from "grammy"
+  const text = ctx.message.text.trim().toLowerCase()
 
-export function registerCommands(bot) {
-  bot.command("start", (ctx) =>
-    ctx.reply(`Hi ${ctx.from?.first_name ?? "there"}. I am alive and hosted on FadeHost. Send /help to see what I can do.`, {
-      reply_markup: new InlineKeyboard().text("Ping me", "ping"),
-    }),
-  )
+  if (text === "نالي") {
+    return ctx.reply("عيوني يا قلبي 💗")
+  }
 
-  bot.command("help", (ctx) =>
-    ctx.reply(["Commands:", "/start  say hello", "/help   this list", "/ping   check I am awake", "/id     show chat and user ids", "", "Send me any text and I echo it back."].join("\n")),
-  )
+  if (text === "مرحبا" || text === "هلا") {
+    return ctx.reply("يا هلا وغلا 🌸")
+  }
 
-  bot.command("ping", (ctx) => ctx.reply("pong"))
+  if (text === "كيفك") {
+    return ctx.reply("بخير دامك بخير ❤️")
+  }
 
-  bot.command("id", (ctx) => ctx.reply(`Chat id: ${ctx.chat.id}\nYour id: ${ctx.from?.id ?? "unknown"}`))
+  if (text === "احبك" || text === "أحبك") {
+    return ctx.reply("وأنا أكثر 💗")
+  }
 
-  bot.callbackQuery("ping", (ctx) => ctx.answerCallbackQuery({ text: "pong" }))
-
-  bot.on("message:text", (ctx) => ctx.reply(ctx.message.text))
-}
+  if (text === "صباح الخير") {
+    return ctx.reply("صباح النور والسرور 🌷")
+  }
+})
